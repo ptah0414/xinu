@@ -625,4 +625,5 @@ extern	devcall	fbputc(struct dentry *, char);
 extern	devcall	fbread(struct dentry *, char *, int32);
 extern	devcall	fbwrite(struct dentry *, char *, int32);
 extern  devcall fbflush(void);
+//extern  devcall fbflush(struct dentry *);
 

@@ -91,8 +91,8 @@ lfl:
 /* type of a local file pseudo-device */
 fb:
 	on nothing
-		-i fbinit	-o ioerr	-c fbclose
-		-r fbread	-g fbgetc	-p fbputc
+		-i fbinit	-o ioerr	-c ioerr
+		-r ioerr	-g ioerr	-p fbputc
 		-w fbwrite	-s ioerr	-n fbcontrol
 		-intr ionull
 

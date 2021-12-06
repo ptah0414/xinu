@@ -3,111 +3,15 @@
 #include <xinu.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-/* app on ring buffer source code */
-
-/*----------------------------------------------------------------------------
- *    prod2   --
- *----------------------------------------------------------------------------
- */
-void prod2(void)
-{
-    int i;
-
-/*
-    char c = 'a';
-
-
-    for( i=1; i<=200; i++ )  {
-        putc(LAB14, c);
-        if(++c == 'z')
-                c = 'a';
-        sleep(2);
-    }
-*/
-
-  char dog[7][30]={
-	".....|\\_/|...................",
-	".....| @ @ . Woof! ..........",
-	".....|   <> .................",
-	".....|  _/\\------____ ((| |))",
-	".....|               `--' |..",
-	" ____|_       ___|   |___.'..",
-	"/_/_____/____/_______|......."
-  };
-  int j;
-  for(i=0;i<7;i++){
-    putc(FB,'\n'); sleep(1);
-    for(j=0;j<30;j++){
-	putc(FB, dog[i][j]);
-	sleep(1);
-    }
-  }
-  for(i=0;i<10;i++){
-    putc(FB,NULL);
-    sleep(1);
-  }
-
-}
-
-/*----------------------------------------------------------------------------
- *  cons2 --
- *----------------------------------------------------------------------------
- */
-void cons2()
-{
-    int i;
-    char c;
-/*
-    for( i=1;  i<=200; i++ )  {
-        c = getc(LAB14);
-        printf("%c-", c);
-        sleep(1);
-    }
-*/
-
-  for(i=0;i<300;i++){
-	c = getc(FB);
-        printf("%c", c);
-        sleep(1);
-  }
-
- 
-}
-
-
-/*--------------------------------------------------------------------------
- *    ring --  producer and consumer process synchronized with semaphores
- *--------------------------------------------------------------------------
-*/
-void ring()
-{
-  resume( create(cons2, 1000, 20, "cons", 0, NULL));
-  resume( create(prod2, 1000, 20, "prod", 0, NULL));
-}
 
 void lab_main()
 {
+  int i;
   init(FB);
   open(FB,"FB","0");
   
-  control(FB,0,0,0);
-  printf("[This is fbputc]\n");
-  char input[7] = "HELLO";
-  int  input_size = 7;
-  int i;
-  for(i=0; i<input_size; i++){
-	putc(FB, input[i]);
-  }
-  fbflush();
-
-  control(FB,0,0,0);
-  printf("\n\n\n[This if fbwrite]\n");
-  char input2[] = "12345678901234561234567890";
-  input_size = strlen(input2);
-  write(FB,input2,input_size);
-  fbflush();
-
   control(FB,0,0,0);
   printf("[PRINT DEMO]");
   char art[16][16] = {
@@ -131,9 +35,18 @@ void lab_main()
   for(i=0; i<art_size; i++){
     write(FB, art[i], art_size);
   }
-  fbflush();
   
-  control(FB,0,0,0);
+  control(FB,100,0,0); //flush
+  //control(FB,0,0,0);
+}
+
+void lab_modi(int cursor, char* c){
+
+  control(FB,1,cursor,0); //change cursor
+  write(FB, c, strlen(c));
+
+  control(FB,100,0,0); //flush
+
 }
 
 
@@ -158,8 +71,13 @@ shellcmd xsh_ps(int nargs, char *args[])
 		printf("Options:\n");
 		printf("\t--help\t display this help and exit\n");
 		return 0;
-	} else if (nargs == 2) {
+	} else if (nargs == 2 && strncmp(args[1],"ice",4) == 0) {
 		lab_main();
+		//ring();
+		return 0;
+	}else if (nargs == 4 && strncmp(args[1],"modi",5) == 0) {
+		int cursor = atoi(args[2]);
+		lab_modi(cursor, args[3]);
 		//ring();
 		return 0;
 	}
